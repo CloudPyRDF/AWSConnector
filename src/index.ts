@@ -9,9 +9,12 @@ import {
 
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 
-import { NotebookPanel, INotebookModel } from '@jupyterlab/notebook';
+import { ICellModel, isCodeCellModel } from "@jupyterlab/cells";
+
+import { NotebookActions, NotebookPanel, INotebookModel } from '@jupyterlab/notebook';
 
 import { IDisposable } from '@lumino/disposable';
+
 
 
 
@@ -28,7 +31,7 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 		// Create the toolbar button
 		let mybutton = new ToolbarButton({
 			label: 'My Button',
-			onClick: () => this.openDialog()
+			onClick: () => this.openDialog(panel)
 		});
 
 		// Add the toolbar button to the notebook toolbar
@@ -39,7 +42,7 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 		return mybutton;
 	}
 
-	openDialog(): void {
+	openDialog(panel: NotebookPanel): void {
 
 		console.log("Opening dialog");
 		
@@ -52,7 +55,7 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 			'<form id="creds-form">' +
 				'<label>Role</label>' +
 				'<a href="#" id = "role-more" style="color:blue">' +
-					'more...' +
+					'  more...' +
 				'</a>' +
 				'<div style="display: none;" id="role-desc">' +
 					'<p>' +
@@ -64,7 +67,7 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 
 				'<label>Credentials</label>' +
 				'<a href="#" id = "creds-more" style="color:blue">' +
-					'more...' +
+					'  more...' +
 				'</a>' +
 				'<div style="display: none;" id="creds-desc">' +
 					'<p>' +
@@ -76,7 +79,7 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 
 				'<label>Region</label>' +
 				'<a href="#" id = "region-more" style="color:blue">' +
-					'more...' +
+					'  more...' +
 				'</a>' +
 				'<div style="display: none;" id="region-desc">' +
 					'<p>' +
@@ -88,7 +91,7 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 
 				'<label>Number of partitions</label>' +
 				'<a href="#" id = "parts-more" style="color:blue">' +
-					'more...' +
+					'  more...' +
 				'</a>' +
 				'<div style="display: none;" id="parts-desc">' +
 					'<p>' +
@@ -96,7 +99,7 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 					'</p>' +
 				'</div><br>' +
 				'<input type="text" id="parts" name="parts"><br><br>' +
-				'<button type="button">Save</button>' +
+				'<button type="button" id="submit-btn">Save</button>' +
 			'</form>';
 
 			var button = document.createElement('button');
@@ -110,9 +113,62 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 			document.getElementById('region-more').addEventListener("click", (e:Event) => this.toggleMore('region-desc'));
 			document.getElementById('parts-more').addEventListener("click", (e:Event) => this.toggleMore('parts-desc'));
 
+			document.getElementById('submit-btn').addEventListener("click", (e:Event) => this.submitData(panel));
+
 			this.dialog.show();
 			this.dialogOpened = true;
 		}
+	}
+
+	submitData = async (panel: NotebookPanel): Promise<any> => {
+		var role = (<HTMLInputElement>document.getElementById('role')).value;
+		var credentials = (<HTMLInputElement>document.getElementById('creds')).value;
+		var region = (<HTMLInputElement>document.getElementById('region')).value;
+		var partitions = (<HTMLInputElement>document.getElementById('parts')).value;
+
+
+		
+		const notebook = panel.content;
+
+		const newCell = notebook.model.contentFactory.createCodeCell({});
+
+
+		let oldIndex = notebook.activeCellIndex;
+
+		notebook.model.cells.insert(0, newCell);
+		notebook.activeCellIndex = 0;
+
+
+		notebook.activeCell.hide();
+
+		const cell: ICellModel = notebook.model.cells.get(0);
+		if (!isCodeCellModel(cell)) {
+		throw new Error("cell is not a code cell.");
+		}
+		cell.value.text = "!ls";
+		await NotebookActions.run(notebook, panel.sessionContext);
+		
+		console.log(cell.outputs.get(0));
+
+		notebook.model.cells.remove(0);
+		notebook.activeCellIndex = oldIndex;
+
+
+		//exec("mkdir -p ~/.aws && cat <<EOF > ~/.aws/credentials\n" + "[" + role + "]\n" + credentials + "\nEOF", (err:string, stdout:string, stderr:string) => {
+		//	if (err) {
+		//	  // node couldn't execute the command
+		//	  return;
+		//	}
+		//  
+		//	// the *entire* stdout and stderr (buffered)
+		//	console.log(`stdout: ${stdout}`);
+		//	console.log(`stderr: ${stderr}`);
+		//});
+
+		console.log(role);
+		console.log(credentials);
+		console.log(region);
+		console.log(partitions);
 	}
 
 	toggleMore(id: string): void {
