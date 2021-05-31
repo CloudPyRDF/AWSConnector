@@ -25,6 +25,14 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 
 	dialogOpened: boolean;
 
+	role: string;
+
+	credentials: string;
+
+	region: string;
+
+	numberOfPartitions: string;
+
 	createNew(panel: NotebookPanel, context: DocumentRegistry.IContext<INotebookModel>): IDisposable {
 
 		this.dialogOpened = false;
@@ -115,18 +123,34 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 
 			document.getElementById('submit-btn').addEventListener("click", (e:Event) => this.submitData(panel));
 
+			this.setData();
+
 			this.dialog.show();
 			this.dialogOpened = true;
 		}
 	}
 
+	setData(): void {
+		if(this.role)
+			(<HTMLInputElement>document.getElementById('role')).value = this.role;
+		if(this.credentials)
+			(<HTMLInputElement>document.getElementById('creds')).value = this.credentials;
+		if(this.region)
+			(<HTMLInputElement>document.getElementById('region')).value = this.region;
+		if(this.numberOfPartitions)
+			(<HTMLInputElement>document.getElementById('parts')).value = this.numberOfPartitions;
+	}
+
+	saveData(): void {
+		this.role = (<HTMLInputElement>document.getElementById('role')).value;
+		this.credentials = (<HTMLInputElement>document.getElementById('creds')).value;
+		this.region = (<HTMLInputElement>document.getElementById('region')).value;
+		this.numberOfPartitions = (<HTMLInputElement>document.getElementById('parts')).value;
+	}
+
 	submitData = async (panel: NotebookPanel): Promise<any> => {
-		var role = (<HTMLInputElement>document.getElementById('role')).value;
-		var credentials = (<HTMLInputElement>document.getElementById('creds')).value;
-		var region = (<HTMLInputElement>document.getElementById('region')).value;
-		var partitions = (<HTMLInputElement>document.getElementById('parts')).value;
-
-
+		
+		this.saveData();
 		
 		const notebook = panel.content;
 
@@ -145,7 +169,10 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 		if (!isCodeCellModel(cell)) {
 		throw new Error("cell is not a code cell.");
 		}
-		cell.value.text = "!ls";
+		if(this.role == "" || this.credentials == "") {
+			//TODO: do something
+		}
+		cell.value.text = "!mkdir -p ~/.aws && cat <<EOF > ~/.aws/credentials\n" + "[" + this.role + "]\n" + this.credentials + "\nEOF";
 		await NotebookActions.run(notebook, panel.sessionContext);
 		
 		console.log(cell.outputs.get(0));
@@ -154,21 +181,10 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 		notebook.activeCellIndex = oldIndex;
 
 
-		//exec("mkdir -p ~/.aws && cat <<EOF > ~/.aws/credentials\n" + "[" + role + "]\n" + credentials + "\nEOF", (err:string, stdout:string, stderr:string) => {
-		//	if (err) {
-		//	  // node couldn't execute the command
-		//	  return;
-		//	}
-		//  
-		//	// the *entire* stdout and stderr (buffered)
-		//	console.log(`stdout: ${stdout}`);
-		//	console.log(`stderr: ${stderr}`);
-		//});
-
-		console.log(role);
-		console.log(credentials);
-		console.log(region);
-		console.log(partitions);
+		console.log(this.role);
+		console.log(this.credentials);
+		console.log(this.region);
+		console.log(this.numberOfPartitions);
 	}
 
 	toggleMore(id: string): void {
@@ -182,10 +198,11 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 	}
 
 	closeDialog(): void {
+
+		this.saveData();
+
 		console.log("Closing...");
-		console.log(this.dialogOpened);
 		if(this.dialogOpened) {
-			console.log("HERE");
 			document.body.removeChild(document.getElementById('dialog-with-form'));
 			this.dialogOpened = false;
 		}
