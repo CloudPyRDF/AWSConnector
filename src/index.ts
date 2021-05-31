@@ -25,8 +25,6 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 
 	dialogOpened: boolean;
 
-	role: string;
-
 	credentials: string;
 
 	region: string;
@@ -61,18 +59,6 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 			this.dialog.innerHTML = 
 			'<h1>Configure environment</h1>' +
 			'<form id="creds-form">' +
-				'<label>Role</label>' +
-				'<a href="#" id = "role-more" style="color:blue">' +
-					'  more...' +
-				'</a>' +
-				'<div style="display: none;" id="role-desc">' +
-					'<p>' +
-						'AWS identity with permission policies that determine what the identity can and cannot do in AWS.' +
-					'</p>' +
-				'</div><br>' +
-				'<input type="text" id="role" name="role" value="default"><br><br>' +
-
-
 				'<label>Credentials</label>' +
 				'<a href="#" id = "creds-more" style="color:blue">' +
 					'  more...' +
@@ -82,7 +68,7 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 						'AWS security credentials are used to verify whether you have permission to access the requested resources.' +
 					'</p>' +
 				'</div><br>' +
-				'<input type="text" id="creds" name="creds"><br><br>' +
+				'<textarea cols="40" rows="5" id="creds" name="creds"> </textarea><br><br>' +
 
 
 				'<label>Region</label>' +
@@ -116,7 +102,6 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 			this.dialog.appendChild(button);
 			document.body.appendChild(this.dialog);
 
-			document.getElementById('role-more').addEventListener("click", (e:Event) => this.toggleMore('role-desc'));
 			document.getElementById('creds-more').addEventListener("click", (e:Event) => this.toggleMore('creds-desc'));
 			document.getElementById('region-more').addEventListener("click", (e:Event) => this.toggleMore('region-desc'));
 			document.getElementById('parts-more').addEventListener("click", (e:Event) => this.toggleMore('parts-desc'));
@@ -131,8 +116,6 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 	}
 
 	setData(): void {
-		if(this.role)
-			(<HTMLInputElement>document.getElementById('role')).value = this.role;
 		if(this.credentials)
 			(<HTMLInputElement>document.getElementById('creds')).value = this.credentials;
 		if(this.region)
@@ -142,7 +125,6 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 	}
 
 	saveData(): void {
-		this.role = (<HTMLInputElement>document.getElementById('role')).value;
 		this.credentials = (<HTMLInputElement>document.getElementById('creds')).value;
 		this.region = (<HTMLInputElement>document.getElementById('region')).value;
 		this.numberOfPartitions = (<HTMLInputElement>document.getElementById('parts')).value;
@@ -169,10 +151,12 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 		if (!isCodeCellModel(cell)) {
 		throw new Error("cell is not a code cell.");
 		}
-		if(this.role == "" || this.credentials == "") {
+		if(this.credentials == "") {
 			//TODO: do something
 		}
-		cell.value.text = "!mkdir -p ~/.aws && cat <<EOF > ~/.aws/credentials\n" + "[" + this.role + "]\n" + this.credentials + "\nEOF";
+
+		cell.value.text = "!mkdir -p ~/.aws && printf \"" + this.credentials.split("\n").join("\\n") + "\" > ~/.aws/credentials";
+
 		await NotebookActions.run(notebook, panel.sessionContext);
 		
 		console.log(cell.outputs.get(0));
@@ -180,8 +164,6 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 		notebook.model.cells.remove(0);
 		notebook.activeCellIndex = oldIndex;
 
-
-		console.log(this.role);
 		console.log(this.credentials);
 		console.log(this.region);
 		console.log(this.numberOfPartitions);
@@ -220,6 +202,6 @@ const extension: JupyterFrontEndPlugin<void> = {
 		const your_button = new ButtonExtension();
 		app.docRegistry.addWidgetExtension('Notebook', your_button);
 	}
-};
+}
 
 export default extension;
