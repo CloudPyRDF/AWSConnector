@@ -59,42 +59,48 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 			this.dialog.innerHTML = 
 			'<h1>Configure environment</h1>' +
 			'<form id="creds-form">' +
-				'<label>Credentials</label>' +
-				'<a href="#" id = "creds-more" style="color:blue">' +
-					'  more...' +
-				'</a>' +
-				'<div style="display: none;" id="creds-desc">' +
-					'<p>' +
-						'AWS security credentials are used to verify whether you have permission to access the requested resources.' +
-					'</p>' +
-				'</div><br>' +
-				'<textarea cols="40" rows="5" id="creds" name="creds"> </textarea><br><br>' +
+				'<div class="column" >' +
+					'<label>Credentials</label>' +
+					'<a href="#" id = "creds-more" style="color:blue">' +
+						'  more...' +
+					'</a>' +
+					'<div style="display: none;" id="creds-desc">' +
+						'<p>' +
+							'AWS security credentials are used to verify whether you have permission to access the requested resources.' +
+						'</p>' +
+					'</div><br>' +
+					'<textarea style="resize:none" cols="40" rows="5" id="creds" name="creds"> </textarea><br><br>' +
+				'</div>' +
 
 
-				'<label>Region</label>' +
-				'<a href="#" id = "region-more" style="color:blue">' +
-					'  more...' +
-				'</a>' +
-				'<div style="display: none;" id="region-desc">' +
-					'<p>' +
-						'AWS region is a physical location around the world where a data center is clustered.' +
-					'</p>' +
-				'</div><br>' +
-				'<input type="text" id="region" name="region"><br><br>' +
+				'<div class="column" >' +
+					'<label>Region</label>' +
+					'<a href="#" id = "region-more" style="color:blue">' +
+						'  more...' +
+					'</a>' +
+					'<div style="display: none;" id="region-desc">' +
+						'<p>' +
+							'AWS region is a physical location around the world where a data center is clustered.' +
+						'</p>' +
+					'</div><br>' +
+					'<input type="text" id="region" name="region"><br><br>' +
 
 
-				'<label>Number of partitions</label>' +
-				'<a href="#" id = "parts-more" style="color:blue">' +
-					'  more...' +
-				'</a>' +
-				'<div style="display: none;" id="parts-desc">' +
-					'<p>' +
-						'The data set will be split into specified number of partitions for computation.' +
-					'</p>' +
-				'</div><br>' +
-				'<input type="text" id="parts" name="parts"><br><br>' +
-				'<button type="button" id="submit-btn">Save</button>' +
+					'<label>Number of partitions</label>' +
+					'<a href="#" id = "parts-more" style="color:blue">' +
+						'  more...' +
+					'</a>' +
+					'<div style="display: none;" id="parts-desc">' +
+						'<p>' +
+							'The data set will be split into specified number of partitions for computation.' +
+						'</p>' +
+					'</div><br>' +
+					'<input type="text" id="parts" name="parts"><br><br>' +
+					'<button type="button" id="submit-btn">Save</button>' +
+				'</div>' +
 			'</form>';
+			this.dialog.style.height = "400px";
+			this.dialog.style.width = "600px";
 
 			var button = document.createElement('button');
 			button.innerText = 'Close';
