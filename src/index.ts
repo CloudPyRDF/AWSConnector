@@ -69,7 +69,7 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 							'AWS security credentials are used to verify whether you have permission to access the requested resources.' +
 						'</p>' +
 					'</div><br>' +
-					'<textarea style="resize:none" cols="40" rows="5" id="creds" name="creds"> </textarea><br><br>' +
+					'<textarea style="resize:none" cols="40" rows="5" id="creds" name="creds"></textarea><br><br>' +
 				'</div>' +
 
 
