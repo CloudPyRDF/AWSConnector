@@ -40,6 +40,7 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 			onClick: () => this.openDialog(panel)
 		});
 
+
 		// Add the toolbar button to the notebook toolbar
 		panel.toolbar.addItem('mybutton', mybutton);
 
@@ -53,6 +54,11 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 		console.log("Opening dialog");
 		
 		if(!this.dialogOpened) {
+
+
+			console.log(this.credentials);
+
+
 			console.log("Opening...");
 			this.dialog = document.createElement('dialog');
 			this.dialog.id = 'dialog-with-form';
@@ -95,6 +101,7 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 							'The data set will be split into specified number of partitions for computation.' +
 						'</p>' +
 					'</div><br>' +
+					'<button type="button" id="load-btn">Search for local credentials</button>' +
 					'<input type="text" id="parts" name="parts"><br><br>' +
 					'<button type="button" id="submit-btn">Save</button>' +
 				'</div>' +
@@ -112,6 +119,8 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 			document.getElementById('region-more').addEventListener("click", (e:Event) => this.toggleMore('region-desc'));
 			document.getElementById('parts-more').addEventListener("click", (e:Event) => this.toggleMore('parts-desc'));
 
+			document.getElementById('load-btn').addEventListener("click", (e:Event) => this.loadData(panel));
+
 			document.getElementById('submit-btn').addEventListener("click", (e:Event) => this.submitData(panel));
 
 			this.setData();
@@ -119,6 +128,45 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 			this.dialog.show();
 			this.dialogOpened = true;
 		}
+	}
+
+	loadData = async (panel: NotebookPanel): Promise<any> => {
+		const notebook = panel.content;
+
+		const newCell = notebook.model.contentFactory.createCodeCell({});
+
+
+		let oldIndex = notebook.activeCellIndex;
+
+		notebook.model.cells.insert(0, newCell);
+		notebook.activeCellIndex = 0;
+
+
+		notebook.activeCell.hide();
+
+		const cell: ICellModel = notebook.model.cells.get(0);
+		if (!isCodeCellModel(cell)) {
+		throw new Error("cell is not a code cell.");
+		}
+
+		cell.value.text = "!cat ~/.aws/credentials";
+
+		await NotebookActions.run(notebook, panel.sessionContext);
+		
+		try {
+			var out = cell.outputs.toJSON();
+			console.log(out[0]["text"]);
+			var data = out[0]["text"].toString();
+			if(data.includes("aws_access_key")) {
+				this.credentials = data;
+				this.setData();
+			}
+		} catch(error) {
+			console.log("No credentials found");
+		}
+
+		notebook.model.cells.remove(0);
+		notebook.activeCellIndex = oldIndex;
 	}
 
 	setData(): void {
@@ -173,6 +221,8 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 		console.log(this.credentials);
 		console.log(this.region);
 		console.log(this.numberOfPartitions);
+
+		this.closeDialog();
 	}
 
 	toggleMore(id: string): void {
