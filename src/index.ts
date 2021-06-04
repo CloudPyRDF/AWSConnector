@@ -64,22 +64,23 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 			this.dialog.id = 'dialog-with-form';
 			this.dialog.innerHTML = 
 			'<h1>Configure environment</h1>' +
+			'<button type="button" id="close-button" style="position: absolute; right: 0; top: 0">Close</button>' +
 			'<form id="creds-form">' +
-				'<div class="column" >' +
+/* 				'<div class="column" >' + */
 					'<label>Credentials</label>' +
 					'<a href="#" id = "creds-more" style="color:blue">' +
-						'  more...' +
+						'   more...' +
 					'</a>' +
 					'<div style="display: none;" id="creds-desc">' +
 						'<p>' +
 							'AWS security credentials are used to verify whether you have permission to access the requested resources.' +
 						'</p>' +
-					'</div><br>' +
-					'<textarea style="resize:none" cols="40" rows="5" id="creds" name="creds"></textarea><br><br>' +
-				'</div>' +
+					'</div>' +
+					'<textarea style="resize:none" cols="68" rows="8" id="creds" name="creds"></textarea><br><br>' +
+/* 				'</div>' + */
 
 
-				'<div class="column" >' +
+/* 				'<div class="column" >' +
 					'<label>Region</label>' +
 					'<a href="#" id = "region-more" style="color:blue">' +
 						'  more...' +
@@ -101,23 +102,22 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 							'The data set will be split into specified number of partitions for computation.' +
 						'</p>' +
 					'</div><br>' +
+					'<input type="text" id="parts" name="parts"><br><br>' + */
 					'<button type="button" id="load-btn">Search for local credentials</button>' +
-					'<input type="text" id="parts" name="parts"><br><br>' +
 					'<button type="button" id="submit-btn">Save</button>' +
-				'</div>' +
+/* 				'</div>' + */
 			'</form>';
-			this.dialog.style.height = "400px";
-			this.dialog.style.width = "600px";
 
-			var button = document.createElement('button');
-			button.innerText = 'Close';
-			button.addEventListener("click", (e:Event) => this.closeDialog());
-			this.dialog.appendChild(button);
+			this.dialog.style.height = "300px";
+			this.dialog.style.width = "500px";
+
 			document.body.appendChild(this.dialog);
 
+			document.getElementById('close-button').addEventListener("click", (e:Event) => this.closeDialog());
+
 			document.getElementById('creds-more').addEventListener("click", (e:Event) => this.toggleMore('creds-desc'));
-			document.getElementById('region-more').addEventListener("click", (e:Event) => this.toggleMore('region-desc'));
-			document.getElementById('parts-more').addEventListener("click", (e:Event) => this.toggleMore('parts-desc'));
+			//document.getElementById('region-more').addEventListener("click", (e:Event) => this.toggleMore('region-desc'));
+			//document.getElementById('parts-more').addEventListener("click", (e:Event) => this.toggleMore('parts-desc'));
 
 			document.getElementById('load-btn').addEventListener("click", (e:Event) => this.loadData(panel));
 
@@ -180,8 +180,8 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 
 	saveData(): void {
 		this.credentials = (<HTMLInputElement>document.getElementById('creds')).value;
-		this.region = (<HTMLInputElement>document.getElementById('region')).value;
-		this.numberOfPartitions = (<HTMLInputElement>document.getElementById('parts')).value;
+		//this.region = (<HTMLInputElement>document.getElementById('region')).value;
+		//this.numberOfPartitions = (<HTMLInputElement>document.getElementById('parts')).value;
 	}
 
 	submitData = async (panel: NotebookPanel): Promise<any> => {
