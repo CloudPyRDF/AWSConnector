@@ -27,16 +27,12 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 
 	credentials: string;
 
-	region: string;
-
-	numberOfPartitions: string;
-
 	createNew(panel: NotebookPanel, context: DocumentRegistry.IContext<INotebookModel>): IDisposable {
 
 		this.dialogOpened = false;
 		// Create the toolbar button
 		let mybutton = new ToolbarButton({
-			label: 'My Button',
+			label: 'AWS Connector',
 			onClick: () => this.openDialog(panel)
 		});
 
@@ -63,12 +59,12 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 			this.dialog = document.createElement('dialog');
 			this.dialog.id = 'dialog-with-form';
 			this.dialog.innerHTML = 
-			'<h1>Configure environment</h1>' +
-			'<button type="button" id="close-button" style="position: absolute; right: 0; top: 0">Close</button>' +
+			'<h1 style="font-family:Arial">Configure environment</h1>' +
+			'<button type="button" id="close-button" style="position: absolute; right: 0; top: 0">X</button>' +
 			'<form id="creds-form">' +
-/* 				'<div class="column" >' + */
+
 					'<label>Credentials</label>' +
-					'<a href="#" id = "creds-more" style="color:blue">' +
+					'<a href="#" id = "creds-more" style="color:blue; font-size:12px">' +
 						'   more...' +
 					'</a>' +
 					'<div style="display: none;" id="creds-desc">' +
@@ -77,38 +73,13 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 						'</p>' +
 					'</div>' +
 					'<textarea style="resize:none" cols="68" rows="8" id="creds" name="creds"></textarea><br><br>' +
-/* 				'</div>' + */
 
-
-/* 				'<div class="column" >' +
-					'<label>Region</label>' +
-					'<a href="#" id = "region-more" style="color:blue">' +
-						'  more...' +
-					'</a>' +
-					'<div style="display: none;" id="region-desc">' +
-						'<p>' +
-							'AWS region is a physical location around the world where a data center is clustered.' +
-						'</p>' +
-					'</div><br>' +
-					'<input type="text" id="region" name="region"><br><br>' +
-
-
-					'<label>Number of partitions</label>' +
-					'<a href="#" id = "parts-more" style="color:blue">' +
-						'  more...' +
-					'</a>' +
-					'<div style="display: none;" id="parts-desc">' +
-						'<p>' +
-							'The data set will be split into specified number of partitions for computation.' +
-						'</p>' +
-					'</div><br>' +
-					'<input type="text" id="parts" name="parts"><br><br>' + */
 					'<button type="button" id="load-btn">Search for local credentials</button>' +
+					'<br><br>' +
 					'<button type="button" id="submit-btn">Save</button>' +
-/* 				'</div>' + */
 			'</form>';
 
-			this.dialog.style.height = "300px";
+			this.dialog.style.height = "310px";
 			this.dialog.style.width = "500px";
 
 			document.body.appendChild(this.dialog);
@@ -116,8 +87,6 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 			document.getElementById('close-button').addEventListener("click", (e:Event) => this.closeDialog());
 
 			document.getElementById('creds-more').addEventListener("click", (e:Event) => this.toggleMore('creds-desc'));
-			//document.getElementById('region-more').addEventListener("click", (e:Event) => this.toggleMore('region-desc'));
-			//document.getElementById('parts-more').addEventListener("click", (e:Event) => this.toggleMore('parts-desc'));
 
 			document.getElementById('load-btn').addEventListener("click", (e:Event) => this.loadData(panel));
 
@@ -172,10 +141,6 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 	setData(): void {
 		if(this.credentials)
 			(<HTMLInputElement>document.getElementById('creds')).value = this.credentials;
-		if(this.region)
-			(<HTMLInputElement>document.getElementById('region')).value = this.region;
-		if(this.numberOfPartitions)
-			(<HTMLInputElement>document.getElementById('parts')).value = this.numberOfPartitions;
 	}
 
 	saveData(): void {
@@ -219,8 +184,6 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 		notebook.activeCellIndex = oldIndex;
 
 		console.log(this.credentials);
-		console.log(this.region);
-		console.log(this.numberOfPartitions);
 
 		this.closeDialog();
 	}
@@ -230,8 +193,10 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 		var display = getComputedStyle(element).display;
 		if(display === 'block') {
 			document.getElementById(id).style.display = "none";
+			this.dialog.style.height = "310px";
 		} else if(display === 'none') {
 			document.getElementById(id).style.display = "block";
+			this.dialog.style.height = "350px";
 		}
 	}
 
