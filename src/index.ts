@@ -75,11 +75,10 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 					'<textarea style="resize:none" cols="68" rows="8" id="creds" name="creds"></textarea><br><br>' +
 
 					'<button type="button" id="load-btn">Search for local credentials</button>' +
-					'<br><br>' +
-					'<button type="button" id="submit-btn">Save</button>' +
+					'<button type="button" id="submit-btn" style="position: absolute; right: 15px">Save</button>' +
 			'</form>';
 
-			this.dialog.style.height = "310px";
+			this.dialog.style.height = "270px";
 			this.dialog.style.width = "500px";
 
 			document.body.appendChild(this.dialog);
@@ -145,8 +144,6 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 
 	saveData(): void {
 		this.credentials = (<HTMLInputElement>document.getElementById('creds')).value;
-		//this.region = (<HTMLInputElement>document.getElementById('region')).value;
-		//this.numberOfPartitions = (<HTMLInputElement>document.getElementById('parts')).value;
 	}
 
 	submitData = async (panel: NotebookPanel): Promise<any> => {
@@ -193,10 +190,10 @@ export class ButtonExtension implements DocumentRegistry.IWidgetExtension<Notebo
 		var display = getComputedStyle(element).display;
 		if(display === 'block') {
 			document.getElementById(id).style.display = "none";
-			this.dialog.style.height = "310px";
+			this.dialog.style.height = "270px";
 		} else if(display === 'none') {
 			document.getElementById(id).style.display = "block";
-			this.dialog.style.height = "350px";
+			this.dialog.style.height = "310px";
 		}
 	}
 
