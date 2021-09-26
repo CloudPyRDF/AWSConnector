@@ -1,225 +1,229 @@
 import {
-	  JupyterFrontEnd,
-	    JupyterFrontEndPlugin
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 
-import {
-	  ToolbarButton
-} from '@jupyterlab/apputils';
+import { ToolbarButton } from '@jupyterlab/apputils';
 
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 
-import { ICellModel, isCodeCellModel } from "@jupyterlab/cells";
+import { ICellModel, isCodeCellModel } from '@jupyterlab/cells';
 
-import { NotebookActions, NotebookPanel, INotebookModel } from '@jupyterlab/notebook';
+import {
+  NotebookActions,
+  NotebookPanel,
+  INotebookModel
+} from '@jupyterlab/notebook';
 
 import { IDisposable } from '@lumino/disposable';
 
+export class ButtonExtension
+  implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel>
+{
+  dialog: HTMLDialogElement;
 
+  dialogOpened: boolean;
 
+  credentials: string;
 
+  createNew(
+    panel: NotebookPanel,
+    context: DocumentRegistry.IContext<INotebookModel>
+  ): IDisposable {
+    this.dialogOpened = false;
+    // Create the toolbar button
+    const toolbarButton = new ToolbarButton({
+      label: 'AWS Connector',
+      onClick: () => this.openDialog(panel)
+    });
 
-export class ButtonExtension implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel> {
+    // Add the toolbar button to the notebook toolbar
+    panel.toolbar.addItem('connectorButton', toolbarButton);
 
-	dialog: HTMLDialogElement;
+    // The ToolbarButton class implements `IDisposable`, so the
+    // button *is* the extension for the purposes of this method.
+    return toolbarButton;
+  }
 
-	dialogOpened: boolean;
+  openDialog(panel: NotebookPanel): void {
+    console.log('Opening dialog');
 
-	credentials: string;
+    if (!this.dialogOpened) {
+      console.log(this.credentials);
 
-	createNew(panel: NotebookPanel, context: DocumentRegistry.IContext<INotebookModel>): IDisposable {
+      console.log('Opening...');
+      this.dialog = document.createElement('dialog');
+      this.dialog.id = 'dialog-with-form';
+      this.dialog.innerHTML = `
+        <h1 id="dialog-title">Configure environment</h1>
+        <button type="button" id="close-button">X</button>
+        <form id="creds-form">
+					<label>Credentials</label>
+					<a href="#" id="creds-more">
+						 more...
+					</a>
+					<div style="display: none;" id="creds-desc">
+						<p>
+							AWS security credentials are used to verify whether you have permission to access the requested resources.
+						</p>
+					</div>
+					<textarea cols="68" rows="8" id="creds" name="creds"></textarea><br><br>
+					<button type="button" id="load-btn">Search for local credentials</button>
+					<button type="button" id="submit-btn">Save</button>
+        </form>
+			`;
 
-		this.dialogOpened = false;
-		// Create the toolbar button
-		let mybutton = new ToolbarButton({
-			label: 'AWS Connector',
-			onClick: () => this.openDialog(panel)
-		});
+      this.dialog.style.height = '270px';
+      this.dialog.style.width = '500px';
 
+      document.body.appendChild(this.dialog);
 
-		// Add the toolbar button to the notebook toolbar
-		panel.toolbar.addItem('mybutton', mybutton);
+      document
+        .getElementById('close-button')
+        .addEventListener('click', () => this.closeDialog());
 
-		// The ToolbarButton class implements `IDisposable`, so the
-		// button *is* the extension for the purposes of this method.
-		return mybutton;
-	}
+      document
+        .getElementById('creds-more')
+        .addEventListener('click', () => this.toggleMore('creds-desc'));
 
-	openDialog(panel: NotebookPanel): void {
+      document
+        .getElementById('load-btn')
+        .addEventListener('click', () => this.loadData(panel));
 
-		console.log("Opening dialog");
-		
-		if(!this.dialogOpened) {
+      document
+        .getElementById('submit-btn')
+        .addEventListener('click', () => this.submitData(panel));
 
+      this.setData();
 
-			console.log(this.credentials);
+      this.dialog.show();
+      this.dialogOpened = true;
+    }
+  }
 
+  loadData = async (panel: NotebookPanel): Promise<any> => {
+    const notebook = panel.content;
 
-			console.log("Opening...");
-			this.dialog = document.createElement('dialog');
-			this.dialog.id = 'dialog-with-form';
-			this.dialog.innerHTML = 
-			'<h1 style="font-family:Arial">Configure environment</h1>' +
-			'<button type="button" id="close-button" style="position: absolute; right: 0; top: 0">X</button>' +
-			'<form id="creds-form">' +
+    const newCell = notebook.model.contentFactory.createCodeCell({});
 
-					'<label>Credentials</label>' +
-					'<a href="#" id = "creds-more" style="color:blue; font-size:12px">' +
-						'   more...' +
-					'</a>' +
-					'<div style="display: none;" id="creds-desc">' +
-						'<p>' +
-							'AWS security credentials are used to verify whether you have permission to access the requested resources.' +
-						'</p>' +
-					'</div>' +
-					'<textarea style="resize:none" cols="68" rows="8" id="creds" name="creds"></textarea><br><br>' +
+    const oldIndex = notebook.activeCellIndex;
 
-					'<button type="button" id="load-btn">Search for local credentials</button>' +
-					'<button type="button" id="submit-btn" style="position: absolute; right: 15px">Save</button>' +
-			'</form>';
+    notebook.model.cells.insert(0, newCell);
+    notebook.activeCellIndex = 0;
 
-			this.dialog.style.height = "270px";
-			this.dialog.style.width = "500px";
+    notebook.activeCell.hide();
 
-			document.body.appendChild(this.dialog);
+    const cell: ICellModel = notebook.model.cells.get(0);
+    if (!isCodeCellModel(cell)) {
+      throw new Error('cell is not a code cell.');
+    }
 
-			document.getElementById('close-button').addEventListener("click", (e:Event) => this.closeDialog());
+    cell.value.text = '!cat ~/.aws/credentials';
 
-			document.getElementById('creds-more').addEventListener("click", (e:Event) => this.toggleMore('creds-desc'));
+    await NotebookActions.run(notebook, panel.sessionContext);
 
-			document.getElementById('load-btn').addEventListener("click", (e:Event) => this.loadData(panel));
+    try {
+      const out = cell.outputs.toJSON();
+      console.log(out[0]['text']);
+      const data = out[0]['text'].toString();
+      if (data.includes('aws_access_key')) {
+        this.credentials = data;
+        this.setData();
+      }
+    } catch (error) {
+      console.log('No credentials found');
+    }
 
-			document.getElementById('submit-btn').addEventListener("click", (e:Event) => this.submitData(panel));
+    notebook.model.cells.remove(0);
+    notebook.activeCellIndex = oldIndex;
+  };
 
-			this.setData();
+  setData(): void {
+    if (this.credentials) {
+      (<HTMLInputElement>document.getElementById('creds')).value =
+        this.credentials;
+    }
+  }
 
-			this.dialog.show();
-			this.dialogOpened = true;
-		}
-	}
+  saveData(): void {
+    this.credentials = (<HTMLInputElement>(
+      document.getElementById('creds')
+    )).value;
+  }
 
-	loadData = async (panel: NotebookPanel): Promise<any> => {
-		const notebook = panel.content;
+  submitData = async (panel: NotebookPanel): Promise<any> => {
+    this.saveData();
 
-		const newCell = notebook.model.contentFactory.createCodeCell({});
+    const notebook = panel.content;
 
+    const newCell = notebook.model.contentFactory.createCodeCell({});
 
-		let oldIndex = notebook.activeCellIndex;
+    const oldIndex = notebook.activeCellIndex;
 
-		notebook.model.cells.insert(0, newCell);
-		notebook.activeCellIndex = 0;
+    notebook.model.cells.insert(0, newCell);
+    notebook.activeCellIndex = 0;
 
+    notebook.activeCell.hide();
 
-		notebook.activeCell.hide();
+    const cell: ICellModel = notebook.model.cells.get(0);
+    if (!isCodeCellModel(cell)) {
+      throw new Error('cell is not a code cell.');
+    }
+    if (this.credentials === '') {
+      //TODO: do something
+    }
 
-		const cell: ICellModel = notebook.model.cells.get(0);
-		if (!isCodeCellModel(cell)) {
-		throw new Error("cell is not a code cell.");
-		}
+    cell.value.text =
+      '!mkdir -p ~/.aws && printf "' +
+      this.credentials.split('\n').join('\\n') +
+      '" > ~/.aws/credentials';
 
-		cell.value.text = "!cat ~/.aws/credentials";
+    await NotebookActions.run(notebook, panel.sessionContext);
 
-		await NotebookActions.run(notebook, panel.sessionContext);
-		
-		try {
-			var out = cell.outputs.toJSON();
-			console.log(out[0]["text"]);
-			var data = out[0]["text"].toString();
-			if(data.includes("aws_access_key")) {
-				this.credentials = data;
-				this.setData();
-			}
-		} catch(error) {
-			console.log("No credentials found");
-		}
+    console.log(cell.outputs.get(0));
 
-		notebook.model.cells.remove(0);
-		notebook.activeCellIndex = oldIndex;
-	}
+    notebook.model.cells.remove(0);
+    notebook.activeCellIndex = oldIndex;
 
-	setData(): void {
-		if(this.credentials)
-			(<HTMLInputElement>document.getElementById('creds')).value = this.credentials;
-	}
+    console.log(this.credentials);
 
-	saveData(): void {
-		this.credentials = (<HTMLInputElement>document.getElementById('creds')).value;
-	}
+    this.closeDialog();
+  };
 
-	submitData = async (panel: NotebookPanel): Promise<any> => {
-		
-		this.saveData();
-		
-		const notebook = panel.content;
+  toggleMore(id: string): void {
+    const element = document.getElementById(id);
+    const display = getComputedStyle(element).display;
+    if (display === 'block') {
+      document.getElementById(id).style.display = 'none';
+      this.dialog.style.height = '270px';
+    } else if (display === 'none') {
+      document.getElementById(id).style.display = 'block';
+      this.dialog.style.height = '310px';
+    }
+  }
 
-		const newCell = notebook.model.contentFactory.createCodeCell({});
+  closeDialog(): void {
+    this.saveData();
 
-
-		let oldIndex = notebook.activeCellIndex;
-
-		notebook.model.cells.insert(0, newCell);
-		notebook.activeCellIndex = 0;
-
-
-		notebook.activeCell.hide();
-
-		const cell: ICellModel = notebook.model.cells.get(0);
-		if (!isCodeCellModel(cell)) {
-		throw new Error("cell is not a code cell.");
-		}
-		if(this.credentials == "") {
-			//TODO: do something
-		}
-
-		cell.value.text = "!mkdir -p ~/.aws && printf \"" + this.credentials.split("\n").join("\\n") + "\" > ~/.aws/credentials";
-
-		await NotebookActions.run(notebook, panel.sessionContext);
-		
-		console.log(cell.outputs.get(0));
-
-		notebook.model.cells.remove(0);
-		notebook.activeCellIndex = oldIndex;
-
-		console.log(this.credentials);
-
-		this.closeDialog();
-	}
-
-	toggleMore(id: string): void {
-		var element = document.getElementById(id);
-		var display = getComputedStyle(element).display;
-		if(display === 'block') {
-			document.getElementById(id).style.display = "none";
-			this.dialog.style.height = "270px";
-		} else if(display === 'none') {
-			document.getElementById(id).style.display = "block";
-			this.dialog.style.height = "310px";
-		}
-	}
-
-	closeDialog(): void {
-
-		this.saveData();
-
-		console.log("Closing...");
-		if(this.dialogOpened) {
-			document.body.removeChild(document.getElementById('dialog-with-form'));
-			this.dialogOpened = false;
-		}
-	}
+    console.log('Closing...');
+    if (this.dialogOpened) {
+      document.body.removeChild(document.getElementById('dialog-with-form'));
+      this.dialogOpened = false;
+    }
+  }
 }
 
 /**
  * Initialization data for the AWSConnector extension.
  */
 const extension: JupyterFrontEndPlugin<void> = {
-	id: 'AWSConnector:plugin',
-	autoStart: true,
-	activate: (app: JupyterFrontEnd) => {
-		console.log('JupyterLab extension AWSConnector is activated!');
-		const your_button = new ButtonExtension();
-		app.docRegistry.addWidgetExtension('Notebook', your_button);
-	}
-}
+  id: 'AWSConnector:plugin',
+  autoStart: true,
+  activate: (app: JupyterFrontEnd) => {
+    console.log('JupyterLab extension AWSConnector is activated!');
+    const your_button = new ButtonExtension();
+    app.docRegistry.addWidgetExtension('Notebook', your_button);
+  }
+};
 
 export default extension;
