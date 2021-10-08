@@ -15,7 +15,11 @@ import {
   INotebookModel
 } from '@jupyterlab/notebook';
 
+import { Kernel, KernelMessage } from '@jupyterlab/services';
+
 import { IDisposable } from '@lumino/disposable';
+
+import { JSONValue } from '@lumino/coreutils';
 
 export class ButtonExtension
   implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel>
@@ -25,6 +29,8 @@ export class ButtonExtension
   dialogOpened: boolean;
 
   credentials: string;
+
+  comm: Kernel.IComm;
 
   createNew(
     panel: NotebookPanel,
@@ -40,9 +46,48 @@ export class ButtonExtension
     // Add the toolbar button to the notebook toolbar
     panel.toolbar.addItem('connectorButton', toolbarButton);
 
+    this.startComm(panel);
     // The ToolbarButton class implements `IDisposable`, so the
     // button *is* the extension for the purposes of this method.
     return toolbarButton;
+  }
+
+  send(msg: JSONValue): void {
+    this.comm.send(msg);
+  }
+
+  sendGetRequest(): void {
+    this.send({ action: 'awsconn-get-request' });
+  }
+
+  sendSetRequest(creds: string): void {
+    this.send({ action: 'awsconn-set-request', credentials: creds });
+  }
+
+  commCallback(msg: KernelMessage.ICommMsgMsg): void | Promise<void> {
+    switch (msg.content.data.action) {
+      case 'awsconn-get-response':
+        this.setCredentials(msg.content.data.creds as string);
+        break;
+      case 'awsconn-set-response':
+        break;
+    }
+  }
+
+  setCredentials(creds: string): void {
+    this.credentials = creds;
+  }
+
+  startComm(panel: NotebookPanel): void {
+    if (this.comm) {
+      this.comm.close();
+    }
+
+    console.log('AWSConnector: Starting Comm with kernel');
+
+    this.comm = panel.sessionContext.session.kernel.createComm('AWSConnector');
+    this.comm.onMsg = (msg: KernelMessage.ICommMsgMsg) =>
+      this.commCallback(msg);
   }
 
   openDialog(panel: NotebookPanel): void {
