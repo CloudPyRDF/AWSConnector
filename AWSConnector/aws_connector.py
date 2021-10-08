@@ -9,26 +9,26 @@ import logging
 
 class AWSConnector:
 
-    def __init__(self, ipython, log):
+    def __init__(self, ipython, logger):
         self.ipython = ipython
-        self.log = log
+        self.logger = logger
         self.connected = False
 
 
 def load_ipython_extension(ipython):
     """ Load Jupyter kernel extension """
 
-    log = logging.getLogger('awsconnector.connector')
-    log.name = 'AWSConnector.connector'
-    log.setLevel(logging.INFO)
-    log.propagate = True
+    logger = logging.getLogger('awsconnector.connector')
+    logger.name = 'AWSConnector.connector'
+    logger.setLevel(logging.INFO)
+    logger.propagate = True
 
     if ipykernel_imported:
         if not isinstance(ipython, zmqshell.ZMQInteractiveShell):
-            log.error("AWSConnector: Ipython not running through notebook. Exiting.")
+            logger.error("AWSConnector: Ipython not running through notebook. Exiting.")
             return
     else:
         return
 
-    log.info("Starting AWSConnector Kernel Extension")
-    connector = AWSConnector(ipython, log)
+    logger.info("Starting AWSConnector Kernel Extension")
+    connector = AWSConnector(ipython, logger)
