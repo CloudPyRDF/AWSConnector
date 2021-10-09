@@ -7,13 +7,7 @@ import { ToolbarButton } from '@jupyterlab/apputils';
 
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 
-import { ICellModel, isCodeCellModel } from '@jupyterlab/cells';
-
-import {
-  NotebookActions,
-  NotebookPanel,
-  INotebookModel
-} from '@jupyterlab/notebook';
+import { NotebookPanel, INotebookModel } from '@jupyterlab/notebook';
 
 import { Kernel, KernelMessage } from '@jupyterlab/services';
 
@@ -37,18 +31,15 @@ export class ButtonExtension
     context: DocumentRegistry.IContext<INotebookModel>
   ): IDisposable {
     this.dialogOpened = false;
-    // Create the toolbar button
+
     const toolbarButton = new ToolbarButton({
       label: 'AWS Connector',
-      onClick: () => this.openDialog(panel)
+      onClick: () => this.openDialog()
     });
 
-    // Add the toolbar button to the notebook toolbar
     panel.toolbar.addItem('connectorButton', toolbarButton);
 
     this.startComm(panel);
-    // The ToolbarButton class implements `IDisposable`, so the
-    // button *is* the extension for the purposes of this method.
     return toolbarButton;
   }
 
@@ -60,8 +51,8 @@ export class ButtonExtension
     this.send({ action: 'awsconn-get-request' });
   }
 
-  sendSetRequest(creds: string): void {
-    this.send({ action: 'awsconn-set-request', credentials: creds });
+  sendSetRequest(): void {
+    this.send({ action: 'awsconn-set-request', credentials: this.credentials });
   }
 
   commCallback(msg: KernelMessage.ICommMsgMsg): void | Promise<void> {
@@ -76,6 +67,7 @@ export class ButtonExtension
 
   setCredentials(creds: string): void {
     this.credentials = creds;
+    this.setData();
   }
 
   startComm(panel: NotebookPanel): void {
@@ -90,7 +82,7 @@ export class ButtonExtension
       this.commCallback(msg);
   }
 
-  openDialog(panel: NotebookPanel): void {
+  openDialog(): void {
     console.log('Opening dialog');
 
     if (!this.dialogOpened) {
@@ -133,11 +125,11 @@ export class ButtonExtension
 
       document
         .getElementById('load-btn')
-        .addEventListener('click', () => this.loadData(panel));
+        .addEventListener('click', () => this.loadData());
 
       document
         .getElementById('submit-btn')
-        .addEventListener('click', () => this.submitData(panel));
+        .addEventListener('click', () => this.submitData());
 
       this.setData();
 
@@ -146,42 +138,9 @@ export class ButtonExtension
     }
   }
 
-  loadData = async (panel: NotebookPanel): Promise<any> => {
-    const notebook = panel.content;
-
-    const newCell = notebook.model.contentFactory.createCodeCell({});
-
-    const oldIndex = notebook.activeCellIndex;
-
-    notebook.model.cells.insert(0, newCell);
-    notebook.activeCellIndex = 0;
-
-    notebook.activeCell.hide();
-
-    const cell: ICellModel = notebook.model.cells.get(0);
-    if (!isCodeCellModel(cell)) {
-      throw new Error('cell is not a code cell.');
-    }
-
-    cell.value.text = '!cat ~/.aws/credentials';
-
-    await NotebookActions.run(notebook, panel.sessionContext);
-
-    try {
-      const out = cell.outputs.toJSON();
-      console.log(out[0]['text']);
-      const data = out[0]['text'].toString();
-      if (data.includes('aws_access_key')) {
-        this.credentials = data;
-        this.setData();
-      }
-    } catch (error) {
-      console.log('No credentials found');
-    }
-
-    notebook.model.cells.remove(0);
-    notebook.activeCellIndex = oldIndex;
-  };
+  loadData(): void {
+    this.sendGetRequest();
+  }
 
   setData(): void {
     if (this.credentials) {
@@ -196,44 +155,17 @@ export class ButtonExtension
     )).value;
   }
 
-  submitData = async (panel: NotebookPanel): Promise<any> => {
+  submitData(): void {
     this.saveData();
 
-    const notebook = panel.content;
-
-    const newCell = notebook.model.contentFactory.createCodeCell({});
-
-    const oldIndex = notebook.activeCellIndex;
-
-    notebook.model.cells.insert(0, newCell);
-    notebook.activeCellIndex = 0;
-
-    notebook.activeCell.hide();
-
-    const cell: ICellModel = notebook.model.cells.get(0);
-    if (!isCodeCellModel(cell)) {
-      throw new Error('cell is not a code cell.');
+    if (this.credentials !== '') {
+      this.sendSetRequest();
     }
-    if (this.credentials === '') {
-      //TODO: do something
-    }
-
-    cell.value.text =
-      '!mkdir -p ~/.aws && printf "' +
-      this.credentials.split('\n').join('\\n') +
-      '" > ~/.aws/credentials';
-
-    await NotebookActions.run(notebook, panel.sessionContext);
-
-    console.log(cell.outputs.get(0));
-
-    notebook.model.cells.remove(0);
-    notebook.activeCellIndex = oldIndex;
 
     console.log(this.credentials);
 
     this.closeDialog();
-  };
+  }
 
   toggleMore(id: string): void {
     const element = document.getElementById(id);
