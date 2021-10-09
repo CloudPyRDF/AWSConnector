@@ -24,7 +24,7 @@ class AWSConnector:
     def send_current_credentials(self):
         with open('~/.aws/credentials', 'r') as file:
             contents = file.readlines()
-        self.send({'action': 'awsconn-get-response', 'creds': contents})
+        self.send({'action': 'awsconn-get-response', 'creds': str(contents)})
 
     def save_credentials(self, creds):
         with open('~/.aws/credentials', 'w') as file:

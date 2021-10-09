@@ -1,3 +1,15 @@
+#connector-dialog {
+    width: 500px;
+}
+
+.connector-dialog-desc-hidden {
+    height: 270px;
+}
+
+.connector-dialog-desc-shown {
+    height: 310px;
+}
+
 #dialog-with-form * {
     font-family: Arial, serif;
 }
@@ -17,24 +29,27 @@
     font-size: 12px;
 }
 
+#creds-desc {
+    display: none;
+}
+
 #creds {
     resize: none;
 }
 
-#load-btn {
+.connector-button {
     border-radius: 15px;
     background-color: #ffcf00;
-    width: 200px;
     height: 20px;
     font-weight: bold;
 }
 
+#load-btn {
+    width: 200px;
+}
+
 #submit-btn {
-    border-radius: 15px;
-    background-color: #ffcf00;
     width: 50px;
-    height: 20px;
-    font-weight: bold;
     position: absolute;
     right: 15px;
 }

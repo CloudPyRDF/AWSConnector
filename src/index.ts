@@ -15,7 +15,7 @@ import { IDisposable } from '@lumino/disposable';
 
 import { JSONValue } from '@lumino/coreutils';
 
-export class ButtonExtension
+export class AWSConnectorExtension
   implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel>
 {
   dialog: HTMLDialogElement;
@@ -99,19 +99,23 @@ export class ButtonExtension
 					<a href="#" id="creds-more">
 						 more...
 					</a>
-					<div style="display: none;" id="creds-desc">
+					<div id="creds-desc">
 						<p>
 							AWS security credentials are used to verify whether you have permission to access the requested resources.
 						</p>
 					</div>
 					<textarea cols="68" rows="8" id="creds" name="creds"></textarea><br><br>
-					<button type="button" id="load-btn">Search for local credentials</button>
-					<button type="button" id="submit-btn">Save</button>
+					<button type="button" class="connector-button" id="load-btn">
+					  Search for local credentials
+          </button>
+					<button type="button" class="connector-button" id="submit-btn">
+					  Save
+					</button>
         </form>
 			`;
 
-      this.dialog.style.height = '270px';
-      this.dialog.style.width = '500px';
+      this.dialog.id = 'connector-dialog';
+      this.dialog.classList.add('connector-dialog-desc-hidden');
 
       document.body.appendChild(this.dialog);
 
@@ -158,7 +162,7 @@ export class ButtonExtension
   submitData(): void {
     this.saveData();
 
-    if (this.credentials !== '') {
+    if (this.credentials.trim() !== '') {
       this.sendSetRequest();
     }
 
@@ -172,10 +176,17 @@ export class ButtonExtension
     const display = getComputedStyle(element).display;
     if (display === 'block') {
       document.getElementById(id).style.display = 'none';
+      this.dialog.classList.replace(
+        'connector-dialog-desc-shown',
+        'connector-dialog-desc-hidden'
+      );
       this.dialog.style.height = '270px';
     } else if (display === 'none') {
       document.getElementById(id).style.display = 'block';
-      this.dialog.style.height = '310px';
+      this.dialog.classList.replace(
+        'connector-dialog-desc-hidden',
+        'connector-dialog-desc-shown'
+      );
     }
   }
 
@@ -198,8 +209,8 @@ const extension: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   activate: (app: JupyterFrontEnd) => {
     console.log('JupyterLab extension AWSConnector is activated!');
-    const your_button = new ButtonExtension();
-    app.docRegistry.addWidgetExtension('Notebook', your_button);
+    const connectorExtension = new AWSConnectorExtension();
+    app.docRegistry.addWidgetExtension('Notebook', connectorExtension);
   }
 };
 
