@@ -104,7 +104,7 @@ export class AWSConnectorExtension
 							AWS security credentials are used to verify whether you have permission to access the requested resources.
 						</p>
 					</div>
-					<textarea cols="68" rows="8" id="creds" name="creds"></textarea><br><br>
+					<textarea cols="65" rows="8" id="creds" name="creds"></textarea><br><br>
 					<button type="button" class="connector-button" id="load-btn">
 					  Search for local credentials
           </button>
@@ -180,7 +180,6 @@ export class AWSConnectorExtension
         'connector-dialog-desc-shown',
         'connector-dialog-desc-hidden'
       );
-      this.dialog.style.height = '270px';
     } else if (display === 'none') {
       document.getElementById(id).style.display = 'block';
       this.dialog.classList.replace(

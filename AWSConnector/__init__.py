@@ -15,3 +15,10 @@ def _jupyter_labextension_paths():
         "dest": data["name"]
     }]
 
+def _jupyter_nbextension_paths():
+    """ Used by "jupyter nbextension" command to install frontend extension """
+    return [dict(
+        section="notebook",
+        dest="AWSConnector",
+        require="AWSConnector/extension"),
+    ]
