@@ -82,11 +82,11 @@ export class AWSConnectorExtension
         'AWSConnector',
         (comm: Kernel.IComm) => {
           this.comm = comm;
+          console.log(this.comm);
           this.comm.onMsg = (msg: KernelMessage.ICommMsgMsg) =>
             this.commCallback(msg);
         }
       );
-      console.log(this.comm);
     });
   }
 
