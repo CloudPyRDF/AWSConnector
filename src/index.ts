@@ -80,6 +80,7 @@ export class AWSConnectorExtension
     panel.sessionContext.ready.then(() => {
       this.comm =
         panel.sessionContext.session.kernel.createComm('AWSConnector');
+      console.log(this.comm);
       this.comm.onMsg = (msg: KernelMessage.ICommMsgMsg) =>
         this.commCallback(msg);
     });
@@ -93,7 +94,6 @@ export class AWSConnectorExtension
 
       console.log('Opening...');
       this.dialog = document.createElement('dialog');
-      this.dialog.id = 'dialog-with-form';
       this.dialog.innerHTML = `
         <h1 id="dialog-title">Configure environment</h1>
         <button type="button" id="close-button">X</button>
@@ -197,7 +197,7 @@ export class AWSConnectorExtension
 
     console.log('Closing...');
     if (this.dialogOpened) {
-      document.body.removeChild(document.getElementById('dialog-with-form'));
+      document.body.removeChild(document.getElementById('connector-dialog'));
       this.dialogOpened = false;
     }
   }
