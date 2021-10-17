@@ -77,9 +77,12 @@ export class AWSConnectorExtension
 
     console.log('AWSConnector: Starting Comm with kernel');
 
-    this.comm = panel.sessionContext.session.kernel.createComm('AWSConnector');
-    this.comm.onMsg = (msg: KernelMessage.ICommMsgMsg) =>
-      this.commCallback(msg);
+    panel.sessionContext.ready.then(() => {
+      this.comm =
+        panel.sessionContext.session.kernel.createComm('AWSConnector');
+      this.comm.onMsg = (msg: KernelMessage.ICommMsgMsg) =>
+        this.commCallback(msg);
+    });
   }
 
   openDialog(): void {
