@@ -80,7 +80,8 @@ export class AWSConnectorExtension
     panel.sessionContext.ready.then(() => {
       panel.sessionContext.session.kernel.registerCommTarget(
         'AWSConnector',
-        (comm: Kernel.IComm) => {
+        async (comm: Kernel.IComm, msg: KernelMessage.ICommOpenMsg) => {
+          console.log(msg);
           this.comm = comm;
           console.log(this.comm);
           this.comm.onMsg = (msg: KernelMessage.ICommMsgMsg) =>
