@@ -47,7 +47,8 @@ export class AWSConnectorExtension
       { method: 'GET' },
       settings
     );
-    alert(await serverResponse.text());
+    const response = await serverResponse.json();
+    this.setCredentials(response['data']);
   }
 
   async sendSetRequest(): Promise<void> {
@@ -57,8 +58,7 @@ export class AWSConnectorExtension
       { method: 'SET', body: '{ "data": ' + this.credentials + ' }' },
       settings
     );
-    const response = await serverResponse.json();
-    this.setCredentials(response['data']);
+    alert(await serverResponse.text());
   }
 
   setCredentials(creds: string): void {
