@@ -2,7 +2,7 @@ from .aws_connector import ConnectorHandler
 
 def _jupyter_server_extension_points():
     return [{
-        "module": "mybutton"
+        "module": "AWSConnector"
     }]
 
 def load_jupyter_server_extension(server_app):
