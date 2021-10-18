@@ -1,25 +1,10 @@
+from .aws_connector import ConnectorHandler
 
-import json
-from pathlib import Path
-
-from ._version import __version__
-
-HERE = Path(__file__).parent.resolve()
-
-with (HERE / "labextension" / "package.json").open() as fid:
-    data = json.load(fid)
-
-def _jupyter_labextension_paths():
+def _jupyter_server_extension_points():
     return [{
-        "src": "labextension",
-        "dest": data["name"]
+        "module": "mybutton"
     }]
 
-def _jupyter_nbextension_paths():
-    """ Used by "jupyter nbextension" command to install frontend extension """
-    return [dict(
-        section="notebook",
-        src="nbextension",
-        dest="AWSConnector",
-        require="AWSConnector/extension"),
-    ]
+def load_jupyter_server_extension(server_app):
+    handlers = [("/AWSConnector", ConnectorHandler)]
+    server_app.web_app.add_handlers(".*$", handlers)

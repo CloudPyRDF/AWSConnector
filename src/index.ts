@@ -9,11 +9,11 @@ import { DocumentRegistry } from '@jupyterlab/docregistry';
 
 import { NotebookPanel, INotebookModel } from '@jupyterlab/notebook';
 
-import { Kernel, KernelMessage } from '@jupyterlab/services';
-
 import { IDisposable } from '@lumino/disposable';
 
-import { JSONValue } from '@lumino/coreutils';
+import { ServerConnection } from '@jupyterlab/services';
+
+import { URLExt } from '@jupyterlab/coreutils';
 
 export class AWSConnectorExtension
   implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel>
@@ -23,8 +23,6 @@ export class AWSConnectorExtension
   dialogOpened: boolean;
 
   credentials: string;
-
-  comm: Kernel.IComm;
 
   createNew(
     panel: NotebookPanel,
@@ -39,56 +37,33 @@ export class AWSConnectorExtension
 
     panel.toolbar.addItem('connectorButton', toolbarButton);
 
-    this.startComm(panel);
     return toolbarButton;
   }
 
-  send(msg: JSONValue): void {
-    this.comm.send(msg);
+  async sendGetRequest(): Promise<void> {
+    const settings = ServerConnection.makeSettings({});
+    const serverResponse = await ServerConnection.makeRequest(
+      URLExt.join(settings.baseUrl, '/AWSConnector'),
+      { method: 'GET' },
+      settings
+    );
+    alert(await serverResponse.text());
   }
 
-  sendGetRequest(): void {
-    this.send({ action: 'awsconn-get-request' });
-  }
-
-  sendSetRequest(): void {
-    this.send({ action: 'awsconn-set-request', credentials: this.credentials });
-  }
-
-  commCallback(msg: KernelMessage.ICommMsgMsg): void | Promise<void> {
-    switch (msg.content.data.action) {
-      case 'awsconn-get-response':
-        this.setCredentials(msg.content.data.creds as string);
-        break;
-      case 'awsconn-set-response':
-        break;
-    }
+  async sendSetRequest(): Promise<void> {
+    const settings = ServerConnection.makeSettings({});
+    const serverResponse = await ServerConnection.makeRequest(
+      URLExt.join(settings.baseUrl, '/AWSConnector'),
+      { method: 'SET', body: '{ "data": ' + this.credentials + ' }' },
+      settings
+    );
+    const response = await serverResponse.json();
+    this.setCredentials(response['data']);
   }
 
   setCredentials(creds: string): void {
     this.credentials = creds;
     this.setData();
-  }
-
-  startComm(panel: NotebookPanel): void {
-    if (this.comm) {
-      this.comm.close();
-    }
-
-    console.log('AWSConnector: Starting Comm with kernel');
-
-    panel.sessionContext.ready.then(() => {
-      panel.sessionContext.session.kernel.registerCommTarget(
-        'AWSConnector',
-        async (comm: Kernel.IComm, msg: KernelMessage.ICommOpenMsg) => {
-          console.log(msg);
-          this.comm = comm;
-          console.log(this.comm);
-          this.comm.onMsg = (msg: KernelMessage.ICommMsgMsg) =>
-            this.commCallback(msg);
-        }
-      );
-    });
   }
 
   openDialog(): void {
