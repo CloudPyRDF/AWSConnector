@@ -55,7 +55,7 @@ export class AWSConnectorExtension
     const settings = ServerConnection.makeSettings({});
     const serverResponse = await ServerConnection.makeRequest(
       URLExt.join(settings.baseUrl, '/AWSConnector'),
-      { method: 'SET', body: '{ "data": ' + this.credentials + ' }' },
+      { method: 'PUT', body: '{ "data": ' + this.credentials + ' }' },
       settings
     );
     alert(await serverResponse.text());
