@@ -11,7 +11,9 @@ class ConnectorHandler(JupyterHandler):
             self.write(json.dumps({'data': ''.join(contents)}))
 
     @tornado.web.authenticated
-    def put(self, data):
+    def put(self):
+        print(self)
+        data = 'xD'
         with open('/root/.aws/credentials', 'w') as f:
             f.write(data)
             self.write(json.dumps({'status': 'OK'}))
