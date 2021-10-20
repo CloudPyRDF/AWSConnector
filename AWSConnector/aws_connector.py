@@ -12,7 +12,7 @@ class ConnectorHandler(JupyterHandler):
 
     @tornado.web.authenticated
     def put(self):
-        print(self)
+        print(self.get_json_body())
         data = 'xD'
         with open('/root/.aws/credentials', 'w') as f:
             f.write(data)
