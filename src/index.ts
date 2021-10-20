@@ -58,7 +58,7 @@ export class AWSConnectorExtension
       { method: 'PUT', body: '{ "data": ' + this.credentials + ' }' },
       settings
     );
-    alert(await serverResponse.text());
+    console.log(serverResponse.text());
   }
 
   setCredentials(creds: string): void {
