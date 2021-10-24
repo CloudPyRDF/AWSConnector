@@ -37,6 +37,12 @@ export class AWSConnectorExtension
 
     panel.toolbar.addItem('connectorButton', toolbarButton);
 
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href =
+      'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css';
+    document.body.appendChild(link);
+
     return toolbarButton;
   }
 
@@ -76,7 +82,7 @@ export class AWSConnectorExtension
       this.dialog = document.createElement('dialog');
       this.dialog.innerHTML = `
         <h1 id="dialog-title">Configure environment</h1>
-        <button type="button" id="close-button">X</button>
+        <button type="button" id="close-button"><i class="fa fa-close"></i></button>
         <form id="creds-form">
 					<label>Credentials</label>
 					<a href="#" id="creds-more">

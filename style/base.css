@@ -45,11 +45,13 @@
     font-weight: bold;
     color: #FFFFFF;
     border-width: 0;
+    transition: 0.5s;
 }
 
 .connector-button:hover {
     cursor: pointer;
     background-color: #FFFFFF;
+    height: 30px;
     color: #FF9900;
     border-width: 1px;
     border-color: #FF9900;
