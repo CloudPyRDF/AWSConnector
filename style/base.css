@@ -1,9 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+
 #connector-dialog {
     width: 500px;
 }
 
 #connector-dialog > * {
-    font-family: Roboto, serif;
+    font-family: Roboto, sans-serif;
     font-size: 15px;
 }
 
@@ -17,6 +19,14 @@
 
 #dialog-title {
 
+}
+
+.action-button {
+    border: none;
+    background-color: #FFFFFF;
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
 }
 
 #close-button {
