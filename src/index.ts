@@ -86,10 +86,14 @@ export class AWSConnectorExtension
       this.dialog = document.createElement('dialog');
       this.dialog.innerHTML = `
         <h1 id="dialog-title">Configure environment</h1>
-        <button type="button" id="close-button"><i class="gg-close"></i></button>
+        <button type="button" class="action-button" id="close-button">
+          <i class="gg-close"></i>
+        </button>
         <form id="creds-form">
 					<label>Credentials</label>
-					<button type="button"><i class="gg-info"></i></button>
+					<button type="button" class="action-button">
+					  <i class="gg-info"></i>
+					</button>
 					<a href="#" id="creds-more">
 						 more...
 					</a>
