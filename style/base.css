@@ -2,6 +2,11 @@
     width: 500px;
 }
 
+#connector-dialog > * {
+    font-family: Roboto, serif;
+    font-size: 15px;
+}
+
 .connector-dialog-desc-hidden {
     height: 270px;
 }
@@ -11,7 +16,7 @@
 }
 
 #dialog-title {
-    font-family: Arial, serif;
+
 }
 
 #close-button {
@@ -35,9 +40,19 @@
 
 .connector-button {
     border-radius: 15px;
-    background-color: #ffcf00;
-    height: 20px;
+    background-color: #FF9900;
+    height: 32px;
     font-weight: bold;
+    color: #FFFFFF;
+    border-width: 0;
+}
+
+.connector-button:hover {
+    cursor: pointer;
+    background-color: #FFFFFF;
+    color: #FF9900;
+    border-width: 1px;
+    border-color: #FF9900;
 }
 
 #load-btn {
