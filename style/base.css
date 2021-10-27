@@ -44,7 +44,9 @@
     top: 0;
     color: #5C7080;
 }
-
+#close-button span {
+    font-size: 18px;
+}
 #info-button {
     width: 15px;
     height: 15px;
