@@ -46,7 +46,7 @@ export class AWSConnectorExtension
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
-    document.body.appendChild(link);
+    document.head.appendChild(link);
   }
 
   async sendGetRequest(): Promise<void> {
