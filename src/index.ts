@@ -87,12 +87,12 @@ export class AWSConnectorExtension
       this.dialog.innerHTML = `
         <h1 id="dialog-title">Configure environment</h1>
         <button type="button" class="action-button" id="close-button">
-          <img src="res/close.svg" alt="Close">
+          <img src="./res/close.svg" alt="Close">
         </button>
         <form id="creds-form">
 					<label>Credentials</label>
 					<button type="button" class="action-button">
-					  <img src="res/info.svg" alt="Info">
+					  <img src="./res/info.svg" alt="Info">
 					</button>
 					<a href="#" id="creds-more">
 						 more...
