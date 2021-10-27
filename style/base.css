@@ -2,6 +2,7 @@
 
 #connector-dialog {
     width: 500px;
+    margin: auto;
 }
 
 #connector-dialog > * {
