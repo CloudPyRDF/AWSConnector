@@ -37,16 +37,15 @@ export class AWSConnectorExtension
 
     panel.toolbar.addItem('connectorButton', toolbarButton);
 
-    this.addIconLink('close');
-    this.addIconLink('info');
+    this.addIconLink();
 
     return toolbarButton;
   }
 
-  addIconLink(name: string): void {
+  addIconLink(): void {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'https://css.gg/' + name + '.css';
+    link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
     document.body.appendChild(link);
   }
 
@@ -87,12 +86,16 @@ export class AWSConnectorExtension
       this.dialog.innerHTML = `
         <h1 id="dialog-title">Configure environment</h1>
         <button type="button" class="action-button" id="close-button">
-          <img src="./res/close.svg" alt="Close">
+          <span class="material-icons-outlined">
+            close
+          </span>
         </button>
         <form id="creds-form">
 					<label>Credentials</label>
 					<button type="button" class="action-button">
-					  <img src="./res/info.svg" alt="Info">
+					  <span class="material-icons-outlined">
+              info
+            </span>
 					</button>
 					<a href="#" id="creds-more">
 						 more...
