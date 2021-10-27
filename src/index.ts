@@ -87,12 +87,12 @@ export class AWSConnectorExtension
       this.dialog.innerHTML = `
         <h1 id="dialog-title">Configure environment</h1>
         <button type="button" class="action-button" id="close-button">
-          <i class="gg-close"></i>
+          <svg><use xlink:href="/all.svg#gg-close"/></svg>
         </button>
         <form id="creds-form">
 					<label>Credentials</label>
 					<button type="button" class="action-button">
-					  <i class="gg-info"></i>
+					  <svg><use xlink:href="/all.svg#gg-info"/></svg>
 					</button>
 					<a href="#" id="creds-more">
 						 more...

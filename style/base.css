@@ -55,17 +55,14 @@
     height: 32px;
     font-weight: bold;
     color: #FFFFFF;
-    border-width: 0;
+    border: 1px #FF9900 solid;
     transition: 0.5s;
 }
 
 .connector-button:hover {
     cursor: pointer;
     background-color: #FFFFFF;
-    height: 30px;
     color: #FF9900;
-    border-width: 1px;
-    border-color: #FF9900;
 }
 
 #load-btn {
