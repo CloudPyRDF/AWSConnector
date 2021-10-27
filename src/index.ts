@@ -98,7 +98,7 @@ export class AWSConnectorExtension
         </button>
         <form id="creds-form">
 					<label>Credentials</label>
-					<button type="button" class="action-button">
+					<button type="button" class="action-button" id="info-button">
 					  <span class="material-icons-outlined">
               info
             </span>

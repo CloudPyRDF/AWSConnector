@@ -33,18 +33,19 @@
 
 .action-button {
     border: none;
-    background-color: #FFFFFF;
+    background-color: transparent;
     cursor: pointer;
-    width: 15px;
-    height: 15px;
 }
 
 #close-button {
     position: absolute;
     right: 0;
     top: 0;
-    font-size: 18px;
     color: #5C7080;
+}
+
+#info-button {
+    transform: translateY(10%);
 }
 
 #creds-more {
