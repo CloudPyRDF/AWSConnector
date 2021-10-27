@@ -18,6 +18,8 @@ import { URLExt } from '@jupyterlab/coreutils';
 export class AWSConnectorExtension
   implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel>
 {
+  shadowBox: HTMLDivElement;
+
   dialog: HTMLDialogElement;
 
   dialogOpened: boolean;
@@ -45,7 +47,8 @@ export class AWSConnectorExtension
   addIconLink(): void {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
+    link.href =
+      'https://fonts.googleapis.com/icon?family=Material+Icons+Outlined';
     document.head.appendChild(link);
   }
 
@@ -80,6 +83,9 @@ export class AWSConnectorExtension
 
     if (!this.dialogOpened) {
       console.log(this.credentials);
+
+      this.shadowBox = document.createElement('div');
+      this.shadowBox.id = 'shadow-box';
 
       console.log('Opening...');
       this.dialog = document.createElement('dialog');
@@ -118,7 +124,8 @@ export class AWSConnectorExtension
       this.dialog.id = 'connector-dialog';
       this.dialog.classList.add('connector-dialog-desc-hidden');
 
-      document.body.appendChild(this.dialog);
+      this.shadowBox.appendChild(this.dialog);
+      document.body.appendChild(this.shadowBox);
 
       document
         .getElementById('close-button')
@@ -195,7 +202,7 @@ export class AWSConnectorExtension
 
     console.log('Closing...');
     if (this.dialogOpened) {
-      document.body.removeChild(document.getElementById('connector-dialog'));
+      document.body.removeChild(document.getElementById('shadow-box'));
       this.dialogOpened = false;
     }
   }
