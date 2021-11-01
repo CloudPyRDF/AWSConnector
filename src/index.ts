@@ -28,7 +28,7 @@ const dialogHTML = `
       <span class="material-icons-outlined">
         info
       </span>
-      <span class="tooltiptext">
+      <span class="tooltip-text">
         AWS security credentials are used to verify whether you have permission to access the requested resources.
       </span>
     </button>
