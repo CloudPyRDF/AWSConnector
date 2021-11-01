@@ -15,6 +15,41 @@ import { ServerConnection } from '@jupyterlab/services';
 
 import { URLExt } from '@jupyterlab/coreutils';
 
+const dialogHTML = `
+  <h1 id="dialog-title">Configure environment</h1>
+  <button type="button" class="action-button" id="close-button">
+    <span class="material-icons-outlined">
+      close
+    </span>
+  </button>
+  <form id="creds-form">
+    <label>Credentials</label>
+    <button type="button" class="action-button tooltip" id="info-button">
+      <span class="material-icons-outlined">
+        info
+      </span>
+      <span class="tooltiptext">
+        AWS security credentials are used to verify whether you have permission to access the requested resources.
+      </span>
+    </button>
+    <a href="#" id="creds-more">
+       more...
+    </a>
+    <div id="creds-desc">
+      <p>
+        AWS security credentials are used to verify whether you have permission to access the requested resources.
+      </p>
+    </div>
+    <textarea cols="65" rows="8" id="creds" name="creds" autofocus></textarea><br><br>
+    <button type="button" class="connector-button" id="load-btn">
+      Search for local credentials
+    </button>
+    <button type="button" class="connector-button" id="submit-btn">
+      Save
+    </button>
+  </form>
+  `;
+
 export class AWSConnectorExtension
   implements DocumentRegistry.IWidgetExtension<NotebookPanel, INotebookModel>
 {
@@ -89,37 +124,7 @@ export class AWSConnectorExtension
 
       console.log('Opening...');
       this.dialog = document.createElement('dialog');
-      this.dialog.innerHTML = `
-        <h1 id="dialog-title">Configure environment</h1>
-        <button type="button" class="action-button" id="close-button">
-          <span class="material-icons-outlined">
-            close
-          </span>
-        </button>
-        <form id="creds-form">
-					<label>Credentials</label>
-					<button type="button" class="action-button" id="info-button">
-					  <span class="material-icons-outlined">
-              info
-            </span>
-					</button>
-					<a href="#" id="creds-more">
-						 more...
-					</a>
-					<div id="creds-desc">
-						<p>
-							AWS security credentials are used to verify whether you have permission to access the requested resources.
-						</p>
-					</div>
-					<textarea cols="65" rows="8" id="creds" name="creds" autofocus></textarea><br><br>
-					<button type="button" class="connector-button" id="load-btn">
-					  Search for local credentials
-          </button>
-					<button type="button" class="connector-button" id="submit-btn">
-					  Save
-					</button>
-        </form>
-			`;
+      this.dialog.innerHTML = dialogHTML;
 
       this.dialog.id = 'connector-dialog';
       this.dialog.classList.add('connector-dialog-desc-hidden');
