@@ -65,10 +65,8 @@
     "style/*.css",
     "style/index.js"
   ],
-  "styleModule": "style/index.js",
   "jupyterlab": {
-    "extension": true,
-    "outputDir": "AWSConnector/labextension"
+    "extension": true
   },
   "browser": {
     "child_process": false
