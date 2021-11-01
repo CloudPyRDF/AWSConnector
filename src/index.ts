@@ -32,14 +32,6 @@ const dialogHTML = `
         AWS security credentials are used to verify whether you have permission to access the requested resources.
       </span>
     </button>
-    <a href="#" id="creds-more">
-       more...
-    </a>
-    <div id="creds-desc">
-      <p>
-        AWS security credentials are used to verify whether you have permission to access the requested resources.
-      </p>
-    </div>
     <textarea cols="65" rows="8" id="creds" name="creds" autofocus></textarea><br><br>
     <button type="button" class="connector-button" id="load-btn">
       Search for local credentials
@@ -48,6 +40,15 @@ const dialogHTML = `
       Save
     </button>
   </form>
+  `;
+
+const snackbarHTML = `
+  <span class="material-icons-outlined">
+    check
+  </span>
+  <p>
+    Credentials saved successfully
+  </p>
   `;
 
 export class AWSConnectorExtension
@@ -75,6 +76,8 @@ export class AWSConnectorExtension
     panel.toolbar.addItem('connectorButton', toolbarButton);
 
     this.addIconLink();
+
+    this.addSnackbar();
 
     return toolbarButton;
   }
@@ -137,10 +140,6 @@ export class AWSConnectorExtension
         .addEventListener('click', () => this.closeDialog());
 
       document
-        .getElementById('creds-more')
-        .addEventListener('click', () => this.toggleMore('creds-desc'));
-
-      document
         .getElementById('load-btn')
         .addEventListener('click', () => this.loadData());
 
@@ -182,24 +181,7 @@ export class AWSConnectorExtension
     console.log(this.credentials);
 
     this.closeDialog();
-  }
-
-  toggleMore(id: string): void {
-    const element = document.getElementById(id);
-    const display = getComputedStyle(element).display;
-    if (display === 'block') {
-      document.getElementById(id).style.display = 'none';
-      this.dialog.classList.replace(
-        'connector-dialog-desc-shown',
-        'connector-dialog-desc-hidden'
-      );
-    } else if (display === 'none') {
-      document.getElementById(id).style.display = 'block';
-      this.dialog.classList.replace(
-        'connector-dialog-desc-hidden',
-        'connector-dialog-desc-shown'
-      );
-    }
+    this.showSnackbar();
   }
 
   closeDialog(): void {
@@ -210,6 +192,21 @@ export class AWSConnectorExtension
       document.body.removeChild(document.getElementById('shadow-box'));
       this.dialogOpened = false;
     }
+  }
+
+  addSnackbar(): void {
+    const snackbar = document.createElement('div');
+    snackbar.id = 'snackbar';
+    snackbar.innerHTML = snackbarHTML;
+    document.body.appendChild(snackbar);
+  }
+
+  showSnackbar(): void {
+    const snackbar = document.getElementById('snackbar');
+    snackbar.className = 'show';
+    setTimeout(() => {
+      snackbar.className = snackbar.className.replace('show', '');
+    }, 3000);
   }
 }
 
