@@ -1,5 +1,4 @@
 *.bundle.*
-lib/
 node_modules/
 *.egg-info/
 .ipynb_checkpoints
@@ -110,3 +109,5 @@ dmypy.json
 
 # OSX files
 .DS_Store
+
+update_frontend.sh
