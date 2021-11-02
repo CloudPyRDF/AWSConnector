@@ -14,7 +14,7 @@
     margin-top: 7%;
 }
 
-#connector-dialog > * {
+#connector-dialog * {
     font-family: Roboto, sans-serif;
     font-size: 15px;
 }
@@ -51,11 +51,12 @@
     transform: translateY(10%);
 }
 
-#info-button span {
+#info-button .material-icons-outlined {
     font-size: 18px;
 }
 
 .tooltip .tooltip-text {
+    font-size: 14px;
     visibility: hidden;
     width: 200px;
     background-color: black;
@@ -70,6 +71,18 @@
     margin-left: -100px;
     opacity: 0;
     transition: opacity 1s;
+
+}
+
+.tooltip .tooltip-text::after {
+    content: " ";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
 }
 
 .tooltip:hover .tooltip-text {
