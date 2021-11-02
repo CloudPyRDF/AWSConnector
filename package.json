@@ -22,7 +22,7 @@
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "style": "style/index.css",
+  "style": "style/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Tequilac/AWSConnector.git"
