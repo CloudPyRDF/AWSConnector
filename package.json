@@ -67,7 +67,8 @@
   ],
   "styleModule": "style/index.js",
   "jupyterlab": {
-    "extension": true
+    "extension": true,
+    "outputDir": "AWSConnector/labextension"
   },
   "browser": {
     "child_process": false
