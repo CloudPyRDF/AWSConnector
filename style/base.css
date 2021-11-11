@@ -21,7 +21,7 @@
 
 #dialog-title {
     font-size: 24px;
-    font-weight: 100;
+    font-weight: 500;
     text-align: center;
 }
 
@@ -54,7 +54,7 @@
     font-size: 14px;
     visibility: hidden;
     width: 300px;
-    background-color: black;
+    background-color: #504f4e;
     color: #fff;
     text-align: center;
     border-radius: 6px;
@@ -79,7 +79,7 @@
     border-width: 6px;
     margin-top: -1px;
     border-style: solid;
-    border-color: black transparent transparent transparent;
+    border-color: #504f4e transparent transparent transparent;
 }
 
 .tooltip:hover .tooltip-text {
@@ -95,10 +95,11 @@
     border-radius: 15px;
     background-color: #FF9900;
     height: 32px;
-    font-weight: bold;
     color: #FFFFFF;
     border: 1px #FF9900 solid;
     transition: 0.5s;
+    font-weight: 400;
+    font-size: 14px;
 }
 
 .connector-button:hover {
@@ -118,6 +119,9 @@
 }
 
 #snackbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
     visibility: hidden;
     min-width: 250px;
     margin-left: -125px;
@@ -136,6 +140,10 @@
     visibility: visible;
     -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
     animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+#snackbar p {
+    font-size: 15px;
 }
 
 @-webkit-keyframes fadein {
