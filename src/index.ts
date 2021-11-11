@@ -131,15 +131,15 @@ export class AWSConnectorExtension
 
       document
         .getElementById('close-button')
-        .addEventListener('click', () => this.closeDialog());
+        ?.addEventListener('click', () => this.closeDialog());
 
       document
         .getElementById('load-btn')
-        .addEventListener('click', () => this.loadData());
+        ?.addEventListener('click', () => this.loadData());
 
       document
         .getElementById('submit-btn')
-        .addEventListener('click', () => this.submitData());
+        ?.addEventListener('click', () => this.submitData());
 
       this.setData();
 

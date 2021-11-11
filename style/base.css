@@ -12,19 +12,12 @@
     border: none;
     border-radius: 5px;
     margin-top: 7%;
+    height: 270px;
 }
 
 #connector-dialog > * {
     font-family: Roboto, sans-serif;
     font-size: 15px;
-}
-
-.connector-dialog-desc-hidden {
-    height: 270px;
-}
-
-.connector-dialog-desc-shown {
-    height: 310px;
 }
 
 #dialog-title {
