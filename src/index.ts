@@ -103,12 +103,11 @@ export class AWSConnectorExtension
 
   async sendSetRequest(): Promise<void> {
     const settings = ServerConnection.makeSettings({});
-    const serverResponse = await ServerConnection.makeRequest(
+    await ServerConnection.makeRequest(
       URLExt.join(settings.baseUrl, '/AWSConnector'),
       { method: 'PUT', body: JSON.stringify({ data: this.credentials }) },
       settings
     );
-    console.log(serverResponse.text());
   }
 
   setCredentials(creds: string): void {
@@ -117,15 +116,10 @@ export class AWSConnectorExtension
   }
 
   openDialog(): void {
-    console.log('Opening dialog');
-
     if (!this.dialogOpened) {
-      console.log(this.credentials);
-
       this.shadowBox = document.createElement('div');
       this.shadowBox.id = 'shadow-box';
 
-      console.log('Opening...');
       this.dialog = document.createElement('dialog');
       this.dialog.innerHTML = dialogHTML;
 
@@ -178,8 +172,6 @@ export class AWSConnectorExtension
       this.sendSetRequest();
     }
 
-    console.log(this.credentials);
-
     this.closeDialog();
     this.showSnackbar();
   }
@@ -187,7 +179,6 @@ export class AWSConnectorExtension
   closeDialog(): void {
     this.saveData();
 
-    console.log('Closing...');
     if (this.dialogOpened) {
       document.body.removeChild(document.getElementById('shadow-box'));
       this.dialogOpened = false;
