@@ -16,15 +16,15 @@ import { ServerConnection } from '@jupyterlab/services';
 import { URLExt } from '@jupyterlab/coreutils';
 
 const dialogHTML = `
-  <h1 id="dialog-title">Configure environment</h1>
-  <button type="button" class="action-button" id="close-button">
+  <h1 id="aws-connector-dialog-title">Configure environment</h1>
+  <button type="button" class="aws-connector-action-button" id="aws-connector-close-button">
     <span class="material-icons-outlined">
       close
     </span>
   </button>
-  <form id="creds-form">
+  <form id="aws-connector-credentials-form">
     <label>Credentials</label>
-    <button type="button" class="action-button tooltip" id="info-button">
+    <button type="button" class="aws-connector-action-button aws-connector-tooltip" id="aws-connector-info-button">
       <span class="material-icons-outlined">
         info
       </span>
@@ -32,11 +32,11 @@ const dialogHTML = `
         AWS security credentials are used to verify whether you have permission to access the requested resources.
       </span>
     </button>
-    <textarea cols="65" rows="8" id="creds" name="creds" autofocus></textarea><br><br>
-    <button type="button" class="connector-button" id="load-btn">
+    <textarea cols="65" rows="8" id="aws-connector-credentials-text" name="credentials-text" autofocus></textarea><br><br>
+    <button type="button" class="aws-connector-button" id="aws-connector-load-button">
       Search for local credentials
     </button>
-    <button type="button" class="connector-button" id="submit-btn">
+    <button type="button" class="aws-connector-button" id="aws-connector-submit-button">
       Save
     </button>
   </form>
@@ -90,15 +90,14 @@ export class AWSConnectorExtension
     document.head.appendChild(link);
   }
 
-  async sendGetRequest(): Promise<void> {
+  async sendGetRequest(): Promise<any> {
     const settings = ServerConnection.makeSettings({});
     const serverResponse = await ServerConnection.makeRequest(
       URLExt.join(settings.baseUrl, '/AWSConnector'),
       { method: 'GET' },
       settings
     );
-    const response = await serverResponse.json();
-    this.setCredentials(response['data']);
+    return serverResponse.json();
   }
 
   async sendSetRequest(): Promise<void> {
@@ -110,35 +109,34 @@ export class AWSConnectorExtension
     );
   }
 
-  setCredentials(creds: string): void {
-    this.credentials = creds;
+  setCredentials(credentials: string): void {
+    this.credentials = credentials;
     this.setData();
   }
 
   openDialog(): void {
     if (!this.dialogOpened) {
       this.shadowBox = document.createElement('div');
-      this.shadowBox.id = 'shadow-box';
+      this.shadowBox.id = 'aws-connector-shadow-box';
 
       this.dialog = document.createElement('dialog');
       this.dialog.innerHTML = dialogHTML;
 
-      this.dialog.id = 'connector-dialog';
-      this.dialog.classList.add('connector-dialog-desc-hidden');
+      this.dialog.id = 'aws-connector-dialog';
 
       this.shadowBox.appendChild(this.dialog);
       document.body.appendChild(this.shadowBox);
 
       document
-        .getElementById('close-button')
+        .getElementById('aws-connector-close-button')
         ?.addEventListener('click', () => this.closeDialog());
 
       document
-        .getElementById('load-btn')
+        .getElementById('aws-connector-load-button')
         ?.addEventListener('click', () => this.loadData());
 
       document
-        .getElementById('submit-btn')
+        .getElementById('aws-connector-submit-button')
         ?.addEventListener('click', () => this.submitData());
 
       this.setData();
@@ -149,19 +147,22 @@ export class AWSConnectorExtension
   }
 
   loadData(): void {
-    this.sendGetRequest();
+    this.sendGetRequest().then(response =>
+      this.setCredentials(response['data'])
+    );
   }
 
   setData(): void {
     if (this.credentials) {
-      (<HTMLInputElement>document.getElementById('creds')).value =
-        this.credentials;
+      (<HTMLInputElement>(
+        document.getElementById('aws-connector-credentials-text')
+      )).value = this.credentials;
     }
   }
 
   saveData(): void {
     this.credentials = (<HTMLInputElement>(
-      document.getElementById('creds')
+      document.getElementById('aws-connector-credentials-text')
     )).value;
   }
 
@@ -169,31 +170,33 @@ export class AWSConnectorExtension
     this.saveData();
 
     if (this.credentials.trim() !== '') {
-      this.sendSetRequest();
+      this.sendSetRequest().then(() => {
+        this.closeDialog();
+        this.showSnackbar();
+      });
     }
-
-    this.closeDialog();
-    this.showSnackbar();
   }
 
   closeDialog(): void {
     this.saveData();
 
     if (this.dialogOpened) {
-      document.body.removeChild(document.getElementById('shadow-box'));
+      document.body.removeChild(
+        document.getElementById('aws-connector-shadow-box')
+      );
       this.dialogOpened = false;
     }
   }
 
   addSnackbar(): void {
     const snackbar = document.createElement('div');
-    snackbar.id = 'snackbar';
+    snackbar.id = 'aws-connector-snackbar';
     snackbar.innerHTML = snackbarHTML;
     document.body.appendChild(snackbar);
   }
 
   showSnackbar(): void {
-    const snackbar = document.getElementById('snackbar');
+    const snackbar = document.getElementById('aws-connector-snackbar');
     snackbar.className = 'show';
     setTimeout(() => {
       snackbar.className = snackbar.className.replace('show', '');
